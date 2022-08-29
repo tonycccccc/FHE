@@ -1,8 +1,10 @@
 #include <iostream>
 #include <gmpxx.h>
+#include <chrono>
+#include <random>
 //#include <gmp.h>
 
-const long LENGTH = 400;
+const long LENGTH = 800;
 
 void taylor_expansion()
 {
@@ -29,8 +31,31 @@ void taylor_expansion()
     gmp_randclear(state);
 }
 
+double ReLU(double num)
+{
+    if (num > 0) return num;
+    return 0;
+}
+
+
 int main() {
+    using namespace std::chrono;
+    time_point<high_resolution_clock> start, end;
+    start = high_resolution_clock::now();
     taylor_expansion();
+    end = high_resolution_clock::now();
+    duration<double, std::nano> elapsed_seconds_taylor = end-start;
+
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_real_distribution<double> dist(-1.0, 1.0);
+    start = high_resolution_clock::now();
+    double res = ReLU(dist(mt));
+    end = high_resolution_clock::now();
+    duration<double, std::nano> elapsed_seconds_relu = end-start;
+
     std::cout << "Finish Simulation!" << std::endl;
+    std::cout << "Taylor Series Latency(ns): " << elapsed_seconds_taylor.count() << std::endl;
+    std::cout << "ReLU Latency(ns): " << elapsed_seconds_relu.count();
     return 0;
 }
